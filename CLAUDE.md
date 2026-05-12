@@ -38,7 +38,7 @@ todo/
 - 로그인 전: `#loginSection` 표시, `#todoApp` 숨김
 - 로그인 후: `#loginSection` 숨김, `#todoApp` 표시, 네비게이션바에 이메일·로그아웃 버튼 노출
 - `sb.auth.onAuthStateChange()`로 상태 감지
-- 현재 `user_id`는 insert에 포함하지 않음 (테이블에 컬럼 미생성 상태)
+- `user_id: currentUser.id`를 insert에 포함하여 RLS 정책 충족
 
 ## Supabase 테이블 스키마
 
@@ -51,13 +51,11 @@ CREATE TABLE IF NOT EXISTS todos (
   date       TEXT    NOT NULL,
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now(),
-  user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE  -- 미적용 상태
+  user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE
 );
 ```
 
-### 사용자별 데이터 분리 적용 시
-
-Supabase SQL 에디터에서 실행:
+### Supabase에서 실행한 설정
 
 ```sql
 ALTER TABLE todos ADD COLUMN IF NOT EXISTS
@@ -70,8 +68,6 @@ CREATE POLICY "own_todos" ON todos
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 ```
-
-그 후 `app.js` `addTodo()`의 insert에 `user_id: currentUser.id` 추가.
 
 ## Supabase 대시보드 설정
 
