@@ -16,9 +16,74 @@
       <span class="brand-logo center">
         <i class="material-icons left">check_circle_outline</i>ToDo List
       </span>
+      <div id="userNav" style="display:none; position:absolute; right:16px; top:50%; transform:translateY(-50%);">
+        <span class="white-text nav-user-email" id="userEmail"></span>
+        <a class="btn waves-effect waves-light btn-logout white indigo-text darken-3"
+           onclick="signOut()">로그아웃</a>
+      </div>
     </div>
   </nav>
 
+  <!-- ── 로그인 섹션 ── -->
+  <div id="loginSection">
+    <div class="card login-card z-depth-3">
+      <div class="card-content">
+        <span class="card-title">
+          <i class="material-icons">lock_outline</i>로그인 / 회원가입
+        </span>
+
+        <!-- 탭 -->
+        <div class="login-tabs">
+          <a id="tabLoginBtn"  class="login-tab active" onclick="switchTab('login')" >로그인</a>
+          <a id="tabSignupBtn" class="login-tab"        onclick="switchTab('signup')">회원가입</a>
+        </div>
+
+        <!-- 로그인 폼 -->
+        <div id="loginForm" class="auth-form visible">
+          <div class="input-field">
+            <i class="material-icons prefix">email</i>
+            <input id="loginEmail" type="email" autocomplete="email">
+            <label for="loginEmail">이메일</label>
+          </div>
+          <div class="input-field">
+            <i class="material-icons prefix">lock</i>
+            <input id="loginPassword" type="password" autocomplete="current-password">
+            <label for="loginPassword">비밀번호</label>
+          </div>
+          <a class="btn waves-effect waves-light indigo darken-2 btn-full"
+             onclick="signIn()">
+            <i class="material-icons left">login</i>로그인
+          </a>
+        </div>
+
+        <!-- 회원가입 폼 -->
+        <div id="signupForm" class="auth-form">
+          <div class="input-field">
+            <i class="material-icons prefix">email</i>
+            <input id="signupEmail" type="email" autocomplete="email">
+            <label for="signupEmail">이메일</label>
+          </div>
+          <div class="input-field">
+            <i class="material-icons prefix">lock</i>
+            <input id="signupPassword" type="password" autocomplete="new-password">
+            <label for="signupPassword">비밀번호 (6자 이상)</label>
+          </div>
+          <div class="input-field">
+            <i class="material-icons prefix">lock_outline</i>
+            <input id="signupConfirm" type="password" autocomplete="new-password">
+            <label for="signupConfirm">비밀번호 확인</label>
+          </div>
+          <a class="btn waves-effect waves-light indigo darken-2 btn-full"
+             onclick="signUp()">
+            <i class="material-icons left">person_add</i>회원가입
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Todo 앱 (로그인 후 표시) ── -->
+  <div id="todoApp" style="display:none;">
   <div class="container main-container">
     <div class="row no-margin">
 
@@ -117,6 +182,7 @@
       </div><!-- /col -->
     </div><!-- /row -->
   </div><!-- /container -->
+  </div><!-- /todoApp -->
 
   <!-- ── 수정 모달 ── -->
   <div id="editModal" class="modal modal-fixed-footer">

@@ -17,6 +17,7 @@ const PRI_LABEL = { high: '높음', medium: '중간', low: '낮음' };
 const PRI_CYCLE = { high: 'medium', medium: 'low', low: 'high' };
 
 // ── 상태 ──────────────────────────────────────────────────────────────────────
+let currentUser    = null;
 let todos          = [];
 let datesWithTodos = new Set();
 let selectedDate   = todayKey();
@@ -291,6 +292,7 @@ async function addTodo() {
 
   const { error } = await sb.from('todos').insert({
     text, done: false, priority: selectedPri, date: selectedDate, sort_order: order,
+    user_id: currentUser.id,
   });
 
   if (error) { toast('추가 실패: ' + error.message); return; }
@@ -376,6 +378,47 @@ async function reorderTodos(fromId, toId, before) {
   else renderTodos();
 }
 
+// ── 인증 ──────────────────────────────────────────────────────────────────────
+async function signIn() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { toast('이메일과 비밀번호를 입력하세요'); return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) toast(authErrMsg(error.message));
+}
+
+async function signUp() {
+  const email    = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirm  = document.getElementById('signupConfirm').value;
+  if (password.length < 6) { toast('비밀번호는 6자 이상이어야 합니다'); return; }
+  if (password !== confirm) { toast('비밀번호가 일치하지 않습니다'); return; }
+  const { error } = await sb.auth.signUp({ email, password });
+  if (error) { toast(authErrMsg(error.message)); return; }
+  M.toast({ html: '가입 완료! 로그인하세요.', classes: 'green darken-2' });
+  switchTab('login');
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+}
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').classList.toggle('visible', isLogin);
+  document.getElementById('signupForm').classList.toggle('visible', !isLogin);
+  document.getElementById('tabLoginBtn').classList.toggle('active', isLogin);
+  document.getElementById('tabSignupBtn').classList.toggle('active', !isLogin);
+  M.updateTextFields();
+}
+
+function authErrMsg(msg) {
+  if (msg.includes('Invalid login credentials')) return '이메일 또는 비밀번호가 올바르지 않습니다';
+  if (msg.includes('Email not confirmed'))        return '이메일 인증을 완료해주세요';
+  if (msg.includes('User already registered'))    return '이미 등록된 이메일입니다';
+  return msg;
+}
+
 // ── 유틸 ──────────────────────────────────────────────────────────────────────
 function toast(msg) {
   M.toast({ html: msg, classes: 'red darken-2' });
@@ -394,5 +437,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setPriority('medium');
   setSort('priority');
-  loadAll();
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      document.getElementById('userEmail').textContent = currentUser.email;
+      document.getElementById('userNav').style.display = '';
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('todoApp').style.display = 'block';
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') loadAll();
+    } else {
+      currentUser = null;
+      document.getElementById('userNav').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'flex';
+      document.getElementById('todoApp').style.display = 'none';
+    }
+  });
 });
