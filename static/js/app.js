@@ -292,7 +292,6 @@ async function addTodo() {
 
   const { error } = await sb.from('todos').insert({
     text, done: false, priority: selectedPri, date: selectedDate, sort_order: order,
-    user_id: currentUser.id,
   });
 
   if (error) { toast('추가 실패: ' + error.message); return; }
