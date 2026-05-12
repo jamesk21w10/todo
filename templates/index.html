@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDo List</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <nav class="indigo darken-3 z-depth-2">
+    <div class="nav-wrapper container">
+      <span class="brand-logo center">
+        <i class="material-icons left">check_circle_outline</i>ToDo List
+      </span>
+    </div>
+  </nav>
+
+  <div class="container main-container">
+    <div class="row no-margin">
+
+      <!-- ── 달력 컬럼 ── -->
+      <div class="col s12 m5 l4">
+        <div class="card calendar-card z-depth-2">
+          <div class="card-content">
+
+            <div class="cal-nav">
+              <button class="btn-flat btn-icon waves-effect" id="prevBtn">
+                <i class="material-icons">chevron_left</i>
+              </button>
+              <span class="month-title" id="monthLabel"></span>
+              <button class="btn-flat btn-icon waves-effect" id="nextBtn">
+                <i class="material-icons">chevron_right</i>
+              </button>
+            </div>
+
+            <div class="center-align" style="margin-bottom:10px">
+              <a class="btn-small waves-effect waves-light indigo darken-2 today-btn"
+                 onclick="goToday()">오늘</a>
+            </div>
+
+            <div class="cal-weekdays">
+              <span class="sun">일</span>
+              <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span>
+              <span class="sat">토</span>
+            </div>
+            <div class="cal-days" id="calDays"></div>
+          </div>
+        </div>
+
+        <div class="date-badge-wrap">
+          <span class="date-badge indigo darken-3 white-text">
+            <i class="material-icons tiny">event</i>
+            <span id="dateLabel"></span>
+          </span>
+        </div>
+      </div>
+
+      <!-- ── 할 일 컬럼 ── -->
+      <div class="col s12 m7 l8">
+
+        <!-- 입력 카드 -->
+        <div class="card input-card z-depth-2">
+          <div class="card-content">
+            <span class="card-title">할 일 추가</span>
+
+            <!-- 우선순위 -->
+            <div class="chip-row">
+              <span class="row-label">우선순위</span>
+              <a class="chip pri-chip" data-p="high"   onclick="setPriority('high')"  >높음</a>
+              <a class="chip pri-chip" data-p="medium" onclick="setPriority('medium')">중간</a>
+              <a class="chip pri-chip" data-p="low"    onclick="setPriority('low')"   >낮음</a>
+            </div>
+
+            <!-- 텍스트 입력 -->
+            <div class="input-field todo-input-field">
+              <i class="material-icons prefix">edit</i>
+              <input id="todoInput" type="text" maxlength="100">
+              <label for="todoInput">할 일을 입력하세요…</label>
+            </div>
+          </div>
+          <div class="card-action right-align">
+            <a class="btn waves-effect waves-light indigo darken-2" onclick="addTodo()">
+              <i class="material-icons left">add</i>추가
+            </a>
+          </div>
+        </div>
+
+        <!-- 정렬 & 통계 -->
+        <div class="sort-stats-row">
+          <div class="chip-row">
+            <span class="row-label">정렬</span>
+            <a class="chip sort-chip" data-s="priority" onclick="setSort('priority')">우선순위</a>
+            <a class="chip sort-chip" data-s="added"    onclick="setSort('added')"   >등록순</a>
+            <a class="chip sort-chip" data-s="name"     onclick="setSort('name')"    >이름순</a>
+            <a class="chip sort-chip" data-s="done"     onclick="setSort('done')"    >완료순</a>
+          </div>
+          <div class="stats-text">
+            <span id="totalCount">전체 0개</span>
+            <span class="grey-text"> · </span>
+            <span id="doneCount">완료 0개</span>
+          </div>
+        </div>
+
+        <!-- 목록 카드 -->
+        <div class="card todo-card z-depth-1">
+          <ul class="collection todo-list" id="todoList"></ul>
+          <div class="empty-state" id="emptyMsg">
+            <i class="material-icons large grey-text text-lighten-2">inbox</i>
+            <p class="grey-text">이 날의 할 일이 없습니다</p>
+          </div>
+        </div>
+
+      </div><!-- /col -->
+    </div><!-- /row -->
+  </div><!-- /container -->
+
+  <!-- ── 수정 모달 ── -->
+  <div id="editModal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h5><i class="material-icons left tiny" style="margin-top:4px">edit</i>할 일 수정</h5>
+
+      <div class="input-field">
+        <input id="editInput" type="text" maxlength="100">
+        <label for="editInput">내용</label>
+      </div>
+
+      <div class="chip-row" style="margin-top:16px">
+        <span class="row-label">우선순위</span>
+        <a class="chip pri-chip" data-p="high"   onclick="setEditPriority('high')"  >높음</a>
+        <a class="chip pri-chip" data-p="medium" onclick="setEditPriority('medium')">중간</a>
+        <a class="chip pri-chip" data-p="low"    onclick="setEditPriority('low')"   >낮음</a>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close btn-flat waves-effect grey-text">취소</a>
+      <a class="btn waves-effect waves-light indigo darken-2" onclick="saveEdit()">
+        <i class="material-icons left">save</i>저장
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/static/js/config.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
