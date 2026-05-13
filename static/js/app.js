@@ -403,6 +403,14 @@ async function signUp() {
   switchTab('login');
 }
 
+async function signInWithGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://jamesk21w10.github.io/todo/' }
+  });
+  if (error) toast(authErrMsg(error.message));
+}
+
 async function signOut() {
   await sb.auth.signOut();
 }
