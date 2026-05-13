@@ -64,11 +64,13 @@ async function loadAll() {
   datesWithTodos = new Set((datesRes.data || []).map(r => r.date));
   renderCalendar();
   renderTodos();
+  loadPreview();
 }
 
 // ── 달력 ──────────────────────────────────────────────────────────────────────
 function renderCalendar() {
-  document.getElementById('monthLabel').textContent = `${calYear}년 ${calMonth}월`;
+  document.getElementById('yearLabel').textContent  = `${calYear}년`;
+  document.getElementById('monthLabel').textContent = `${calMonth}월`;
 
   const grid     = document.getElementById('calDays');
   const today    = todayKey();
@@ -130,6 +132,8 @@ function goToday() {
   loadAll();
 }
 
+document.getElementById('prevYearBtn').onclick = () => { calYear--;  renderCalendar(); };
+document.getElementById('nextYearBtn').onclick = () => { calYear++;  renderCalendar(); };
 document.getElementById('prevBtn').onclick = () => {
   if (--calMonth < 1) { calMonth = 12; calYear--; }
   renderCalendar();
@@ -417,6 +421,115 @@ function authErrMsg(msg) {
   if (msg.includes('Email not confirmed'))        return '이메일 인증을 완료해주세요';
   if (msg.includes('User already registered'))    return '이미 등록된 이메일입니다';
   return msg;
+}
+
+// ── 3일 미리보기 ──────────────────────────────────────────────────────────────
+function relativeDay(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return toKey(d.getFullYear(), d.getMonth() + 1, d.getDate());
+}
+
+function fmtShortDate(key) {
+  const [, m, d] = key.split('-');
+  const dow = ['일', '월', '화', '수', '목', '금', '토'][new Date(key).getDay()];
+  return `${+m}/${+d}(${dow})`;
+}
+
+async function loadPreview() {
+  const keys   = [relativeDay(-1), todayKey(), relativeDay(1)];
+  const labels = ['전일', '오늘', '내일'];
+  const ids    = ['prevDayPreview', 'todayPreview', 'nextDayPreview'];
+
+  const results = await Promise.all(
+    keys.map(k =>
+      sb.from('todos').select('*').eq('date', k)
+        .order('sort_order', { ascending: true })
+        .order('id',         { ascending: true })
+    )
+  );
+
+  ids.forEach((id, i) =>
+    renderPreviewCol(
+      document.getElementById(id),
+      keys[i], labels[i], i === 1,
+      results[i].data || []
+    )
+  );
+}
+
+function renderPreviewCol(el, dateKey, label, isToday, items) {
+  el.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = `preview-card card z-depth-1${isToday ? ' preview-today' : ''}`;
+  card.onclick = () => jumpToDate(dateKey);
+
+  const header = document.createElement('div');
+  header.className = 'preview-header';
+
+  const lbl = document.createElement('span');
+  lbl.className = `preview-label${isToday ? ' today' : ''}`;
+  lbl.textContent = label;
+
+  const dateSpan = document.createElement('span');
+  dateSpan.className = 'preview-date';
+  dateSpan.textContent = fmtShortDate(dateKey);
+
+  const countSpan = document.createElement('span');
+  countSpan.className = 'preview-count';
+  const doneCount = items.filter(t => t.done).length;
+  countSpan.textContent = items.length > 0 ? `${doneCount}/${items.length}완료` : '0개';
+
+  header.appendChild(lbl);
+  header.appendChild(dateSpan);
+  header.appendChild(countSpan);
+  card.appendChild(header);
+
+  const ul = document.createElement('ul');
+  ul.className = 'preview-list';
+
+  if (items.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'preview-empty';
+    li.textContent = '할 일 없음';
+    ul.appendChild(li);
+  } else {
+    items.slice(0, 5).forEach(todo => {
+      const li = document.createElement('li');
+      li.className = `preview-item${todo.done ? ' is-done' : ''}`;
+
+      const dot = document.createElement('span');
+      dot.className = `preview-dot pri-${todo.priority}`;
+
+      const text = document.createElement('span');
+      text.className = `preview-text${todo.done ? ' done' : ''}`;
+      text.textContent = todo.text;
+
+      li.appendChild(dot);
+      li.appendChild(text);
+      ul.appendChild(li);
+    });
+
+    if (items.length > 5) {
+      const more = document.createElement('li');
+      more.className = 'preview-more';
+      more.textContent = `+${items.length - 5}개 더`;
+      ul.appendChild(more);
+    }
+  }
+
+  card.appendChild(ul);
+  el.appendChild(card);
+}
+
+function jumpToDate(dateKey) {
+  const [y, m] = dateKey.split('-').map(Number);
+  selectedDate = dateKey;
+  calYear  = y;
+  calMonth = m;
+  loadAll();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── 유틸 ──────────────────────────────────────────────────────────────────────

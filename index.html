@@ -94,10 +94,19 @@
           <div class="card-content">
 
             <div class="cal-nav">
+              <button class="btn-flat btn-icon waves-effect" id="prevYearBtn">
+                <i class="material-icons">chevron_left</i>
+              </button>
+              <span class="month-title" id="yearLabel"></span>
+              <button class="btn-flat btn-icon waves-effect" id="nextYearBtn">
+                <i class="material-icons">chevron_right</i>
+              </button>
+            </div>
+            <div class="cal-nav cal-nav-month">
               <button class="btn-flat btn-icon waves-effect" id="prevBtn">
                 <i class="material-icons">chevron_left</i>
               </button>
-              <span class="month-title" id="monthLabel"></span>
+              <span class="month-title month-only" id="monthLabel"></span>
               <button class="btn-flat btn-icon waves-effect" id="nextBtn">
                 <i class="material-icons">chevron_right</i>
               </button>
@@ -183,6 +192,19 @@
       </div><!-- /col -->
     </div><!-- /row -->
   </div><!-- /container -->
+
+  <!-- ── 3일 미리보기 ── -->
+  <div class="preview-section container">
+    <div class="preview-heading">
+      <i class="material-icons tiny">date_range</i> 3일 미리보기
+    </div>
+    <div class="row">
+      <div class="col s12 m4" id="prevDayPreview"></div>
+      <div class="col s12 m4" id="todayPreview"></div>
+      <div class="col s12 m4" id="nextDayPreview"></div>
+    </div>
+  </div>
+
   </div><!-- /todoApp -->
 
   <!-- ── 수정 모달 ── -->
