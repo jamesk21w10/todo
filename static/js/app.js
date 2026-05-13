@@ -70,7 +70,7 @@ async function loadAll() {
 // ── 달력 ──────────────────────────────────────────────────────────────────────
 function renderCalendar() {
   document.getElementById('yearLabel').textContent  = `${calYear}년`;
-  document.getElementById('monthLabel').textContent = `${calMonth}월`;
+  document.getElementById('monthLabel').textContent = `${String(calMonth).padStart(2, '0')}월`;
 
   const grid     = document.getElementById('calDays');
   const today    = todayKey();

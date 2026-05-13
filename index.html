@@ -93,23 +93,25 @@
         <div class="card calendar-card z-depth-2">
           <div class="card-content">
 
-            <div class="cal-nav">
-              <button class="btn-flat btn-icon waves-effect" id="prevYearBtn">
-                <i class="material-icons">chevron_left</i>
-              </button>
-              <span class="month-title" id="yearLabel"></span>
-              <button class="btn-flat btn-icon waves-effect" id="nextYearBtn">
-                <i class="material-icons">chevron_right</i>
-              </button>
-            </div>
-            <div class="cal-nav cal-nav-month">
-              <button class="btn-flat btn-icon waves-effect" id="prevBtn">
-                <i class="material-icons">chevron_left</i>
-              </button>
-              <span class="month-title month-only" id="monthLabel"></span>
-              <button class="btn-flat btn-icon waves-effect" id="nextBtn">
-                <i class="material-icons">chevron_right</i>
-              </button>
+            <div class="cal-nav-updown">
+              <div class="cal-unit">
+                <button class="btn-flat btn-icon waves-effect" id="nextYearBtn" title="다음 해">
+                  <i class="material-icons">keyboard_arrow_up</i>
+                </button>
+                <span class="month-title" id="yearLabel"></span>
+                <button class="btn-flat btn-icon waves-effect" id="prevYearBtn" title="이전 해">
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </button>
+              </div>
+              <div class="cal-unit">
+                <button class="btn-flat btn-icon waves-effect" id="nextBtn" title="다음 달">
+                  <i class="material-icons">keyboard_arrow_up</i>
+                </button>
+                <span class="month-title" id="monthLabel"></span>
+                <button class="btn-flat btn-icon waves-effect" id="prevBtn" title="이전 달">
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </button>
+              </div>
             </div>
 
             <div class="center-align" style="margin-bottom:10px">
